@@ -6,6 +6,13 @@ app.use(cors())
 app.set('view engine', 'ejs')
 const bodyparser = require("body-parser")
 const mongoose = require('mongoose')
+var session = require('express-session')
+
+app.use(session({
+    secret: 'ljkdghfoh',
+    saveUninitialized: true,
+    resave: true
+}))
 
 app.use(bodyparser.urlencoded({
     extended: true
@@ -22,7 +29,16 @@ const timeeventSchema = new mongoose.Schema({
     hits: Number
 });
 
+const userSchema = new mongoose.Schema({
+    firstname: String,
+    lastname: String,
+    username: String,
+    email: String,
+    password: String
+})
+
 const timeeventModel = mongoose.model("timeevents", timeeventSchema);
+const userModel = mongoose.model("users", userSchema)
 
 app.listen(process.env.PORT || 5000, (err) => {
     if (err)
@@ -30,6 +46,23 @@ app.listen(process.env.PORT || 5000, (err) => {
 })
 
 app.use(express.static('./public'))
+
+app.put('/signup/create', function (req, res) {
+    userModel.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+    }, function (err, data) {
+        if (err) {
+            console.log('Error' + err)
+        } else {
+            console.log('Data' + data)
+        }
+        res.send("New user created!")
+    })
+})
 
 app.put('/timeline/insert', function (req, res) {
     console.log(req.body)

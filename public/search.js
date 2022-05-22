@@ -243,8 +243,9 @@ function getHistory() {
 async function storeIdHistory() {
     searchedId = $('#pokemonId').val()
     currentTime = new Date()
+    console.log(searchedId)
     await $.ajax({
-        url: 'https://fast-reef-36186.herokuapp.com/timeline/insert',
+        url: 'http://localhost:5000/timeline/insert',
         type: 'PUT',
         data: {
             text: `A user had searched by ID:${searchedId}`,
