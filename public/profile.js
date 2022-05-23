@@ -6,7 +6,7 @@ function getUserName() {
         url: 'https://arcane-forest-89383.herokuapp.com/userObj',
         type: 'GET',
         success: (userObj) => {
-            $('#firstname').html(userObj.firstname)
+            $('.firstname').html(userObj.firstname)
         }
     })
 }
