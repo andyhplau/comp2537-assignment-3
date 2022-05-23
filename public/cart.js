@@ -96,7 +96,7 @@ function removeItem() {
     itemId = $(this).attr('id')
     $.ajax({
         // url: 'http://localhost:5002/cart/remove',
-        url: 'https://arcane-forest-89383.herokuapp.com/cart/delete',
+        url: 'https://arcane-forest-89383.herokuapp.com/cart/remove',
         type: 'POST',
         data: {
             itemId: itemId
