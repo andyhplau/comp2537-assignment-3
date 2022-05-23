@@ -20,7 +20,7 @@ function populateUser(user){
 
 async function getUserId() {
     await $.ajax({
-        url: 'http://localhost:5002/userObj',
+        url: 'https://arcane-forest-89383.herokuapp.com/userObj',
         type: 'GET',
         success: populateUser
     })
