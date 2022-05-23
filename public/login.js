@@ -3,7 +3,8 @@ async function authenticateUser() {
     password = $('#password').val()
     console.log(username, password)
     await $.ajax({
-        url: 'http://localhost:5000/login/authentication',
+        url: 'http://localhost:5002/login/authentication',
+        // url: 'https://fast-reef-36186.herokuapp.com/login/authentication',
         type: 'POST',
         data: {
             username: username,

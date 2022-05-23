@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const https = require('https')
 const cors = require('cors')
+const path = require('path')
 app.use(cors())
 app.set('view engine', 'ejs')
 const bodyparser = require("body-parser")
@@ -40,12 +41,16 @@ const userSchema = new mongoose.Schema({
 const timeeventModel = mongoose.model("timeevents", timeeventSchema);
 const userModel = mongoose.model("users", userSchema)
 
-app.listen(process.env.PORT || 5000, (err) => {
+app.listen(process.env.PORT || 5002, (err) => {
     if (err)
         console.log(err)
 })
 
 app.use(express.static('./public'))
+
+app.get('/signup', function (req, res) {
+    res.sendFile(path.join(__dirname + '/public/signup.html'))
+})
 
 app.put('/signup/create', function (req, res) {
     userModel.create({
@@ -72,13 +77,19 @@ app.post('/login/authentication', function (req, res) {
             console.log('Data' + users)
         }
 
-        user = users.filter((userobj) => {
-            return userobj.username == req.body.username
+        user = users.filter((userObj) => {
+            return userObj.username == req.body.username
         })
 
         if (user[0].password == req.body.password) {
             req.session.authenticated = true
-            req.session.userobj = user[0]
+            req.session.userObj = {
+                userId: user[0]._id,
+                username: user[0].username,
+                firstname: user[0].firstname,
+                lastname: user[0].lastname,
+                email: user[0].email
+            }
             res.send('success')
         } else {
             req.session.authenticated = false
@@ -87,11 +98,35 @@ app.post('/login/authentication', function (req, res) {
     })
 })
 
-app.post('/login', function (req, res) {
+app.get('/userObj', function (req, res) {
+    res.send(req.session.userObj)
+})
+
+app.get('/login', function (req, res) {
+    console.log(req.session.authenticated)
     if (req.session.authenticated) {
-        window.location.href = './profile.html'
+        res.redirect('/profile')
+    } else {
+        res.sendFile(path.join(__dirname + '/public/login.html'))
     }
 })
+
+app.get('/profile', function (req, res) {
+    if (req.session.authenticated) {
+        res.sendFile(path.join(__dirname + '/public/profile.html'))
+    } else {
+        res.redirect('/login')
+    }
+})
+
+app.get('/search', function (req, res) {
+    if (req.session.authenticated) {
+        res.sendFile(path.join(__dirname + '/public/search.html'))
+    } else {
+        res.redirect('/login')
+    }
+})
+
 app.put('/timeline/insert', function (req, res) {
     console.log(req.body)
     timeeventModel.create({

@@ -245,7 +245,7 @@ async function storeIdHistory() {
     currentTime = new Date()
     console.log(searchedId)
     await $.ajax({
-        url: 'http://localhost:5000/timeline/insert',
+        url: 'http://localhost:5002/timeline/insert',
         type: 'PUT',
         data: {
             text: `A user had searched by ID:${searchedId}`,
