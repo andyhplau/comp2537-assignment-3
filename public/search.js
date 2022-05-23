@@ -23,6 +23,17 @@ currentPage = null
 numOfPages = null
 resultArray = null
 
+function getUserName() {
+    $.ajax({
+        // url: 'http://localhost:5002/userObj',
+        url: 'https://arcane-forest-89383.herokuapp.com/userObj',
+        type: 'GET',
+        success: (userObj) => {
+            $('#firstname').html(userObj.firstname)
+        }
+    })
+}
+
 function populatePokemon(data) {
     searchedPokemons += '<div class="cardContainer">'
 
@@ -40,7 +51,8 @@ function populatePokemon(data) {
     <h2 class="pokemonID">${data.id}</h2>
     <h3 class="price">$ ${data.weight}</h3>
     </a>
-    <button class="addToCart" id="${data.id}">Add to Cart</button>
+    <button class="addToCart" id="${data.weight}" name="${data.name}" value="${data.id}">Add to Cart</button>
+    <span class="added" id="${data.id}"></span>
     </div>
     </div>
     `
@@ -305,9 +317,30 @@ async function storeHistory(type_url) {
     getHistory()
 }
 
+async function saveToCart() {
+    pokemonId = $(this).attr('value')
+    pokemonName = $(this).attr('name')
+    price = $(this).attr('id')
+    await $.ajax({
+        // url: 'http://localhost:5002/cart/add',
+        url: 'https://arcane-forest-89383.herokuapp.com/cart/add',
+        type: 'PUT',
+        data: {
+            pokemonId: pokemonId,
+            pokemonName: pokemonName,
+            price: price
+        },
+        success: (x)=>{
+            console.log(x)
+        }
+    })
+    $(`#${pokemonId}`).html('Added to Cart!')
+}
+
 function setup() {
     populateTypes()
     getHistory()
+    getUserName()
     $("#idSearch").click(searchById)
     $("#nameSearch").click(searchByName)
     $("body").on("click", ".pages", pageButton)
@@ -315,6 +348,7 @@ function setup() {
     $("body").on("click", ".deleteButton", deleteHistory)
     $("body").on("click", "#idSearch", storeIdHistory)
     $("body").on("click", "#nameSearch", storeNameHistory)
+    $('body').on('click', '.addToCart', saveToCart)
     $("#pokeType").change(() => {
         displayPokemon($("#pokeType option:selected").val())
         storeHistory($("#pokeType option:selected").val())

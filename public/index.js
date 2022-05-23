@@ -22,10 +22,10 @@ const backgroundColors = {
 ninePokemons = ''
 pokemonList = []
 
-function getUserId() {
+function getUserName() {
     $.ajax({
-        url: 'http://localhost:5002/userObj',
-        // url: 'https://arcane-forest-89383.herokuapp.com/userObj',
+        // url: 'http://localhost:5002/userObj',
+        url: 'https://arcane-forest-89383.herokuapp.com/userObj',
         type: 'GET',
         success: (userObj) => {
             $('#firstname').html(userObj.firstname)
@@ -87,16 +87,14 @@ async function saveToCart() {
     pokemonId = $(this).attr('value')
     pokemonName = $(this).attr('name')
     price = $(this).attr('id')
-    quantity = 1
     await $.ajax({
-        url: 'http://localhost:5002/cart/add',
-        // url: 'https://arcane-forest-89383.herokuapp.com/cart/add',
+        // url: 'http://localhost:5002/cart/add',
+        url: 'https://arcane-forest-89383.herokuapp.com/cart/add',
         type: 'PUT',
         data: {
             pokemonId: pokemonId,
             pokemonName: pokemonName,
-            price: price,
-            quantity: quantity
+            price: price
         },
         success: (x)=>{
             console.log(x)
@@ -106,7 +104,7 @@ async function saveToCart() {
 }
 
 function setup() {
-    getUserId()
+    getUserName()
     loadNinePokemons()
     $('body').on('click', '.addToCart', saveToCart)
 }

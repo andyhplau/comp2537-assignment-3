@@ -44,6 +44,7 @@ const orderSchema = new mongoose.Schema({
     pokemonName: String,
     price: Number,
     quantity: Number,
+    total: Number,
     status: String,
     checkoutTime: String,
     orderId: String
@@ -148,13 +149,22 @@ app.get('/search', function (req, res) {
     }
 })
 
+app.get('/cart', function (req, res) {
+    if (req.session.authenticated) {
+        res.sendFile(path.join(__dirname + '/public/cart.html'))
+    } else {
+        res.redirect('/login')
+    }
+})
+
 app.put('/cart/add', function (req, res) {
     orderModel.create({
         userId: req.session.userObj.userId,
         pokemonId: req.body.pokemonId,
         pokemonName: req.body.pokemonName,
         price: req.body.price,
-        quantity: req.body.quantity,
+        quantity: 1,
+        total: req.body.price,
         status: 'cart',
         checkoutTime: null,
         orderId: null
@@ -165,6 +175,110 @@ app.put('/cart/add', function (req, res) {
             console.log("Data " + data);
         }
         res.send("Added to cart!");
+    })
+})
+
+app.get('/cart/item', function (req, res) {
+    orderModel.find({}, function (err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Data " + data);
+        }
+        userItems = data.filter((items) => {
+            return (items.userId == req.session.userObj.userId) && (items.status == 'cart')
+        })
+        res.send(userItems)
+    })
+})
+
+app.post('/cart/update', function (req, res) {
+    orderModel.updateOne({
+        _id: req.body.uniqueId,
+    }, {
+        $set: {
+            quantity: req.body.quantity,
+            total: req.body.total
+        }
+    }, function (err, data) {
+        if (err) {
+            console.log("Error " + err)
+        } else {
+            console.log("Data " + data)
+        }
+    })
+    orderModel.find({}, function (err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Data " + data);
+        }
+        userItems = data.filter((items) => {
+            return (items.userId == req.session.userObj.userId) && (items.status == 'cart')
+        })
+        res.send(userItems)
+    })
+})
+
+app.post('/cart/checkout', function (req, res) {
+    orderModel.update({
+        $and: [{
+                userId: req.body.userId
+            },
+            {
+                status: 'cart'
+            }
+        ]
+    }, {
+        $set: {
+            status: 'ordered',
+            checkoutTime: req.body.time,
+            orderId: req.body.time
+        }
+    }, function (err, data) {
+        if (err) {
+            console.log("Error " + err)
+        } else {
+            console.log("Data " + data)
+        }
+        res.send(data)
+    })
+})
+
+app.post('/cart/remove', function (req, res) {
+    orderModel.remove({
+        _id: req.body.itemId,
+    }, function (err, data) {
+        if (err) {
+            console.log("Error " + err)
+        } else {
+            console.log("Data " + data)
+        }
+    })
+    orderModel.find({}, function (err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Data " + data);
+        }
+        userItems = data.filter((items) => {
+            return (items.userId == req.session.userObj.userId) && (items.status == 'cart')
+        })
+        res.send(userItems)
+    })
+})
+
+app.get('/cart/orders', function(req,res){
+    orderModel.find({}, function (err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Data " + data);
+        }
+        orderedItems = data.filter((items) => {
+            return (items.userId == req.session.userObj.userId) && (items.status == 'ordered')
+        })
+        res.send(orderedItems)
     })
 })
 
