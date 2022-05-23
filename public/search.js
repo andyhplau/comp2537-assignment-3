@@ -121,7 +121,7 @@ function processTypes(data) {
 async function populateTypes() {
     await $.ajax({
         type: 'GET',
-        url: 'https://warm-lowlands-28229.herokuapp.com/api/type/',
+        url: 'https://pokeapi.co/api/v2/type',
         success: processTypes
     })
     displayPokemon($("#pokeType option:selected").val())
@@ -134,10 +134,10 @@ async function searchById() {
     id = $("#pokemonId").val()
     if ($.isNumeric(id)) {
         searchedPokemons += '<div class="pokemonCol">'
-        console.log(`https://warm-lowlands-28229.herokuapp.com/api/pokemon/id/${id}`)
+        console.log(`https://pokeapi.co/api/v2/pokemon/${id}`)
         await $.ajax({
             type: 'GET',
-            url: `https://warm-lowlands-28229.herokuapp.com/api/pokemon/id/${id}`,
+            url: `https://pokeapi.co/api/v2/pokemon/${id}`,
             success: populatePokemon
         })
         searchedPokemons += '</div>'
@@ -153,10 +153,10 @@ async function searchByName() {
     $("main").empty()
     pokeName = $("#pokemonName").val()
     searchedPokemons += '<div class="pokemonCol">'
-    console.log(`https://warm-lowlands-28229.herokuapp.com/api/pokemon/name/${pokeName}`)
+    console.log(`https://pokeapi.co/api/v2/pokemon/${pokeName}`)
     await $.ajax({
         type: 'GET',
-        url: `https://warm-lowlands-28229.herokuapp.com/api/pokemon/name/${pokeName}`,
+        url: `https://pokeapi.co/api/v2/pokemon/${pokeName}`,
         success: populatePokemon
     })
     searchedPokemons += '</div>'
@@ -245,7 +245,7 @@ async function storeIdHistory() {
     currentTime = new Date()
     console.log(searchedId)
     await $.ajax({
-        url: 'http://localhost:5002/timeline/insert',
+        url: 'https://fast-reef-36186.herokuapp.com/timeline/insert',
         type: 'PUT',
         data: {
             text: `A user had searched by ID:${searchedId}`,
