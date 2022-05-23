@@ -38,7 +38,9 @@ function populatePokemon(data) {
     <h1 class="pokemonName">${data.name.toUpperCase()}</h1>
     <img src="${data.sprites.other['official-artwork'].front_default}">
     <h2 class="pokemonID">${data.id}</h2>
+    <h3 class="price">$ ${data.weight}</h3>
     </a>
+    <button class="addToCart" id="${data.id}">Add to Cart</button>
     </div>
     </div>
     `

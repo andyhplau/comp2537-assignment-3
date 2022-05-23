@@ -22,6 +22,17 @@ const backgroundColors = {
 ninePokemons = ''
 pokemonList = []
 
+function getUserId() {
+    $.ajax({
+        url: 'http://localhost:5002/userObj',
+        // url: 'https://arcane-forest-89383.herokuapp.com/userObj',
+        type: 'GET',
+        success: (userObj) => {
+            $('#firstname').html(userObj.firstname)
+        }
+    })
+}
+
 function processPokemon(data) {
     ninePokemons += '<div class="cardContainer">'
 
@@ -37,7 +48,10 @@ function processPokemon(data) {
     <h1 class="pokemonName">${data.name.toUpperCase()}</h1>
     <img src="${data.sprites.other['official-artwork'].front_default}">
     <h2 class="pokemonID">${data.id}</h2>
+    <h3 class="price">$ ${data.weight}</h3>
     </a>
+    <button class="addToCart" id="${data.weight}" name="${data.name}" value="${data.id}">Add to Cart</button>
+    <span class="added" id="${data.id}"></span>
     </div>
     </div>
     `
@@ -49,10 +63,10 @@ async function loadNinePokemons() {
             ninePokemons += '<div class="pokemonCol">'
         }
 
-        pokemonID = Math.ceil(Math.random() * 26)
+        pokemonID = Math.ceil(Math.random() * 600)
 
         while (pokemonList.includes(pokemonID)) {
-            pokemonID = Math.ceil(Math.random() * 26)
+            pokemonID = Math.ceil(Math.random() * 600)
         }
         pokemonList.push(pokemonID)
 
@@ -69,8 +83,32 @@ async function loadNinePokemons() {
     $('main').html(ninePokemons)
 }
 
+async function saveToCart() {
+    pokemonId = $(this).attr('value')
+    pokemonName = $(this).attr('name')
+    price = $(this).attr('id')
+    quantity = 1
+    await $.ajax({
+        url: 'http://localhost:5002/cart/add',
+        // url: 'https://arcane-forest-89383.herokuapp.com/cart/add',
+        type: 'PUT',
+        data: {
+            pokemonId: pokemonId,
+            pokemonName: pokemonName,
+            price: price,
+            quantity: quantity
+        },
+        success: (x)=>{
+            console.log(x)
+        }
+    })
+    $(`#${pokemonId}`).html('Added to Cart!')
+}
+
 function setup() {
+    getUserId()
     loadNinePokemons()
+    $('body').on('click', '.addToCart', saveToCart)
 }
 
 $(document).ready(setup)

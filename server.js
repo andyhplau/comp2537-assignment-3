@@ -38,12 +38,33 @@ const userSchema = new mongoose.Schema({
     password: String
 })
 
+const orderSchema = new mongoose.Schema({
+    userId: String,
+    pokemonId: Number,
+    pokemonName: String,
+    price: Number,
+    quantity: Number,
+    status: String,
+    checkoutTime: String,
+    orderId: String
+})
+
 const timeeventModel = mongoose.model("timeevents", timeeventSchema);
 const userModel = mongoose.model("users", userSchema)
+const orderModel = mongoose.model("orders", orderSchema)
 
 app.listen(process.env.PORT || 5002, (err) => {
     if (err)
         console.log(err)
+})
+
+app.get('/', function (req, res) {
+    console.log(req.session.authenticated)
+    if (req.session.authenticated) {
+        res.sendFile(path.join(__dirname + '/public/index.html'))
+    } else {
+        res.redirect('/login')
+    }
 })
 
 app.use(express.static('./public'))
@@ -125,6 +146,26 @@ app.get('/search', function (req, res) {
     } else {
         res.redirect('/login')
     }
+})
+
+app.put('/cart/add', function (req, res) {
+    orderModel.create({
+        userId: req.session.userObj.userId,
+        pokemonId: req.body.pokemonId,
+        pokemonName: req.body.pokemonName,
+        price: req.body.price,
+        quantity: req.body.quantity,
+        status: 'cart',
+        checkoutTime: null,
+        orderId: null
+    }, function (err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Data " + data);
+        }
+        res.send("Added to cart!");
+    })
 })
 
 app.put('/timeline/insert', function (req, res) {
@@ -239,7 +280,8 @@ app.get('/pokemon/:id', function (req, res) {
                 'defense': pokemonDefense,
                 'speed': pokemonSpeed,
                 'height': data.height,
-                'weight': data.weight
+                'weight': data.weight,
+                'price': data.weight
             })
         })
     })
