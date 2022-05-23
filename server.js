@@ -64,6 +64,34 @@ app.put('/signup/create', function (req, res) {
     })
 })
 
+app.post('/login/authentication', function (req, res) {
+    userModel.find({}, function (err, users) {
+        if (err) {
+            console.log('Error' + err)
+        } else {
+            console.log('Data' + users)
+        }
+
+        user = users.filter((userobj) => {
+            return userobj.username == req.body.username
+        })
+
+        if (user[0].password == req.body.password) {
+            req.session.authenticated = true
+            req.session.userobj = user[0]
+            res.send('success')
+        } else {
+            req.session.authenticated = false
+            res.send('fail')
+        }
+    })
+})
+
+app.post('/login', function (req, res) {
+    if (req.session.authenticated) {
+        window.location.href = './profile.html'
+    }
+})
 app.put('/timeline/insert', function (req, res) {
     console.log(req.body)
     timeeventModel.create({
